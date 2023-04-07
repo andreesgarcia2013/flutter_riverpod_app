@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_app/presentation/providers/providers.dart';
 
 
-class StateProviderScreen extends StatelessWidget {
+class StateProviderScreen extends ConsumerWidget {
   const StateProviderScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final counter=ref.watch(counterProvider);
+    final isDarkMode=ref.watch(isDarkProvider);
+    final name=ref.watch(randomNameProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('State Provider'),
@@ -17,16 +22,25 @@ class StateProviderScreen extends StatelessWidget {
 
             IconButton(
               // icon: const Icon( Icons.light_mode_outlined, size: 100 ),
-              icon: const Icon( Icons.dark_mode_outlined, size: 100 ),
-              onPressed: () {},
+              icon:  Icon(
+                isDarkMode?
+                 Icons.dark_mode_outlined:
+                 Icons.light_mode_outlined,
+                size: 100
+              ),
+              onPressed: () {
+                ref.read(isDarkProvider.notifier).update((state) => !state);
+              },
             ),
 
-            const Text('Fernando Herrera', style: TextStyle(fontSize: 25 )),
+             Text(name, style: TextStyle(fontSize: 25 )),
 
             TextButton.icon(
               icon: const Icon( Icons.add, size: 50,),
-              label: const Text('0', style: TextStyle(fontSize: 100)),
-              onPressed: () {},
+              label:  Text('$counter', style: TextStyle(fontSize: 100)),
+              onPressed: () {
+                ref.read(counterProvider.notifier).update((state) => state+1);
+              },
             ),
             
             const Spacer( flex: 2 ),
@@ -36,7 +50,10 @@ class StateProviderScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton.extended(
         label: const Text('Nombre aleatorio'),
         icon: const Icon( Icons.refresh_rounded ),
-        onPressed: () {},
+        onPressed: () {
+
+          ref.invalidate(randomNameProvider);
+        },
       ),
     );
   }
